@@ -3,8 +3,6 @@ package dev.smartpanda.campoMinado.modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.smartpanda.campoMinado.excecao.ExplosaoException;
-
 public class Campo {
 	
 	private final int linha;
@@ -61,7 +59,7 @@ public class Campo {
 				campoAberto = true;
 				
 				if(campoMinado) { // caso marque uma mina
-					throw new ExplosaoException();
+				//TODO IMPLEMENTAR NOVA VERSAO
 				}
 				
 				if (vizinhacaSegura()) { // se o campo nao esta minado, o metodo abre os vizinhos, que testam novamente se é minado sucessivamente
@@ -131,21 +129,6 @@ public class Campo {
 			campoMinado = false;
 		}
 		
-		public String toString() {
-			if(campoMarcado) {
-				return "X";
-			} else if (campoAberto && campoMinado) {
-				return "*";
-			} else if (campoAberto && minasNaVizinhanca() > 0) {
-				return Long.toString(minasNaVizinhanca());
-			} else if (campoAberto) {
-				return " ";
-			} else {
-				return "?";
-			}
-			
-			
-		}
 }
 
 

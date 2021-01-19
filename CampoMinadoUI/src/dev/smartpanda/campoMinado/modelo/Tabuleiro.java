@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import dev.smartpanda.campoMinado.excecao.ExplosaoException;
-
 public class Tabuleiro {
 	
 	private int linhas;
@@ -34,7 +32,8 @@ public class Tabuleiro {
 			.findFirst()
 			.ifPresent (c -> c.abrirCampo());
 			
-		} catch (ExplosaoException e) {
+		} catch (Exception e) {
+			// FIXME Ajustar implementação metodo abrir
 			campos.forEach(c -> c.setCampoAberto(true));
 			throw e;
 			
@@ -88,35 +87,5 @@ public class Tabuleiro {
 	public void reiniciarTab() {
 		campos.stream().forEach(c -> c.reiniciarCampo());
 		sortearMinas();
-	}
-	
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		
-		sb.append("  ");
-		for (int c = 0; c < colunas; c++) {
-			sb.append(" ");
-			sb.append(c);
-			sb.append(" ");
-		}
-		sb.append("\n");
-		
-		int i = 0;
-		for (int l = 0; l < linhas; l++) {
-			sb.append(l);
-			sb.append(" ");
-			for (int c = 0; c < colunas; c++) {
-				
-				sb.append(" ");
-				sb.append(campos.get(i));
-				sb.append(" ");
-				i++;
-			}
-			sb.append("\n");
-		}
-		
-		return sb.toString();
-		
-	}
-		
+	}		
 }
