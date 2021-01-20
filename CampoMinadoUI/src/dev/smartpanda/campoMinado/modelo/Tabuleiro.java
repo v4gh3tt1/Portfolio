@@ -2,15 +2,18 @@ package dev.smartpanda.campoMinado.modelo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class Tabuleiro {
+public class Tabuleiro implements CampoObservador{
 	
 	private int linhas;
 	private int colunas;
 	private int minas;
 	
 	private final List<Campo> campos = new ArrayList<>();
+	private final List<Consumer<ResultadoEvento>>observadores = 
+			new ArrayList<>();
 
 	public Tabuleiro(int linhas, int colunas, int minas) {
 		
@@ -24,21 +27,22 @@ public class Tabuleiro {
 		
 	}
 	
+	public void registrarObservador(Consumer<ResultadoEvento> observador) {
+		observadores.add(observador);
+	}
+	
+	private void notificarObservadores(boolean resultado) {
+		observadores.stream()
+		.forEach(o -> o.accept(new ResultadoEvento(resultado)));
+		
+	}
+	
 	
 	public void abrir (int linha, int coluna) {
-		try {
 			campos.parallelStream()
 			.filter(c -> c.getLinha() == linha && c.getColuna() == coluna)
 			.findFirst()
-			.ifPresent (c -> c.abrirCampo());
-			
-		} catch (Exception e) {
-			// FIXME Ajustar implementação metodo abrir
-			campos.forEach(c -> c.setCampoAberto(true));
-			throw e;
-			
-		}
-
+			.ifPresent (c -> c.abrirCampo());	
 	}
 	
 
@@ -53,7 +57,9 @@ public class Tabuleiro {
 	private void gerarCampos() {
 		for (int l = 0; l < linhas; l++) {
 			for (int c = 0; c < colunas; c++) {
-				campos.add(new Campo(l, c));
+				Campo campo = new Campo(linhas, colunas);
+				campo.registrarObservador(this);
+				campos.add(campo);
 			}
 			
 		}
@@ -88,4 +94,22 @@ public class Tabuleiro {
 		campos.stream().forEach(c -> c.reiniciarCampo());
 		sortearMinas();
 	}		
+	
+	@Override
+	public void eventoOcorreu (Campo campo, CampoEvento evento) {
+		if (evento == CampoEvento.EXPLODIR) {
+			System.out.println("perdeu");
+			notificarObservadores(false);
+		} else if (objAalcancado()) {
+			System.out.println("Ganhou");
+			notificarObservadores(true);
+		}
+	}
+	private void mostrarMinas() {
+		campos.stream()
+		.filter(c -> c.isMinado());
+		campos.forEach(c -> c.setCampoAberto(true));
+		
+	}
+	
 }

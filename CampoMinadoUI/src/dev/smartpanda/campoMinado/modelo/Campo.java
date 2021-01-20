@@ -62,18 +62,27 @@ public class Campo {
 
 		// metodo para aternar entre campos marcados (bandeira) quando ainda fechados
 		void alternarMarcacao() {
+			
 			if (!campoAberto) {
 				campoMarcado = !campoMarcado;
+				
+				if(campoMarcado) {
+					notificarObservadores(CampoEvento.MARCAR);
+				} else {
+					notificarObservadores(CampoEvento.DESMARCAR);
+				}
 			}
 		}
 		
 		boolean abrirCampo() {
-			if (!campoAberto && !campoMarcado) {
-				campoAberto = true;
-				
+			if (!campoAberto && !campoMarcado) {			
 				if(campoMinado) { // caso marque uma mina
-				//TODO IMPLEMENTAR NOVA VERSAO
+					notificarObservadores(CampoEvento.EXPLODIR);
+					return true;					
 				}
+				
+				setCampoAberto(true);
+				
 				
 				if (vizinhacaSegura()) { // se o campo nao esta minado, o metodo abre os vizinhos, que testam novamente se é minado sucessivamente
 					vizinhos.forEach(v -> v.abrirCampo());
@@ -102,6 +111,10 @@ public class Campo {
 				
 		void setCampoAberto(boolean campoAberto) {
 			this.campoAberto = campoAberto;
+			
+			if (campoAberto) {
+				notificarObservadores(CampoEvento.ABRIR);
+			}
 		}
 
 		public boolean isCampoAberto() {
